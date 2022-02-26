@@ -40,9 +40,8 @@ split -v \n\
 focus next \n\
 select 2 \n\
 stuff "sleep 3; rosrun controller_manager spawner position_joint_trajectory_controller" \n\
-layout save default' > /screen_conf_base
-
-RUN echo $'\
+layout save default' > /screen_conf_base \
+&& echo $'\
 #!/bin/bash\n\
 main(){\n\
 source /franka_ws/devel/setup.bash \n\
