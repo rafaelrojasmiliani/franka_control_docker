@@ -6,6 +6,7 @@ RUN  apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
             build-essential cmake git libpoco-dev libeigen3-dev \
 			python3-catkin-tools screen vim iproute2 iputils-* \
+			ros-melodic-joint-trajectory-controller \
     && git clone --recursive --branch 0.7.1 https://github.com/frankaemika/libfranka /libfranka && cd /libfranka \
     && mkdir build \
     && cd build \
@@ -34,11 +35,11 @@ mousetrack on \n\
 screen -t franka_control 1 bash \n\
 screen -t control_manager_and_bash  2 bash \n\
 select 1 \n\
-stuff "roslaunch franka_control franka_control.launch robot_ip:=ROBOT_IP" \n\
+stuff "sleep 2; roslaunch franka_control franka_control.launch robot_ip:=ROBOT_IP" \n\
 split -v \n\
 focus next \n\
 select 2 \n\
-stuff "rosrun controller_manager spawner position_joint_trajectory_controller" \n\
+stuff "sleep 3; rosrun controller_manager spawner position_joint_trajectory_controller" \n\
 layout save default' > /screen_conf_base
 
 RUN echo $'\
