@@ -11,7 +11,7 @@ RUN set -x && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
             build-essential cmake git libpoco-dev libeigen3-dev \
 			screen vim iproute2 iputils-* \
-			ros-${ROSDISTRO}-joint-trajectory-controller \
+			ros-${ROSDISTRO}-joint-trajectory-controller ros-${ROSDISTRO}-control-toolbox \
     && git clone --recursive --branch ${LIBFRANKA_VERSION} https://github.com/frankaemika/libfranka /libfranka && cd /libfranka \
     && [ -f /libfranka/src/control_types.cpp ] && sed -i '1 i\#include <stdexcept>' /libfranka/src/control_types.cpp || true \
     && [ -f /libfranka/include/franka/control_tools.h ] && sed -i '1 i\#include <string>' /libfranka/include/franka/control_tools.h || true \
@@ -23,7 +23,8 @@ RUN set -x && apt-get update \
     && dpkg -i libfranka*deb \
     && rosdep update \
     && mkdir -p franka_ws/src \
-    && git clone --recursive  ${FRANKAROS_REPO} /franka_ws/src/franka_ros \
+    && git clone --recursive --branch ${FRANKAROS_BRANCH} ${FRANKAROS_REPO} /franka_ws/src/franka_ros \
+    && [ -d /franka_ws/src/franka_ros/franka_moveit_config ] && rm -rf /franka_ws/src/franka_ros/franka_moveit_config || true \
     && cd /franka_ws \
     && rosdep install -r -q  --from-paths src --skip-keys libfranka --ignore-src  --rosdistro ${ROSDISTRO} -y \
     && source /opt/ros/${ROSDISTRO}/setup.bash \
