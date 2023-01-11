@@ -2,6 +2,7 @@ ARG ROSDISTRO
 FROM moveit/moveit:${ROSDISTRO}-release
 ARG ROSDISTRO
 ARG LIBFRANKA_VERSION
+ARG FRANKAROS_VERSION
 
 SHELL ["bash", "-c"]
 WORKDIR /
@@ -10,20 +11,20 @@ RUN  apt-get update \
             build-essential cmake git libpoco-dev libeigen3-dev \
 			python3-catkin-tools screen vim iproute2 iputils-* \
 			ros-${ROSDISTRO}-joint-trajectory-controller \
-    && git clone --recursive --branch 0.7.1 https://github.com/frankaemika/libfranka /libfranka && cd /libfranka \
+    && git clone --recursive --branch ${LIBFRANKA_VERSION} https://github.com/frankaemika/libfranka /libfranka && cd /libfranka \
     && mkdir build \
     && cd build \
     && cmake -DCMAKE_BUILD_TYPE=Release .. \
-    && make -j 16  \
+    && make -j $(nproc)  \
     && cpack -G DEB \
     && dpkg -i libfranka*deb \
     && rosdep update \
     && mkdir -p franka_ws/src \
-    && git clone --recursive --branch 0.7.0 https://github.com/frankaemika/franka_ros /franka_ws/src/franka_ros \
+    && git clone --recursive --branch ${FRANKAROS_VERSION} https://github.com/frankaemika/franka_ros /franka_ws/src/franka_ros \
     && cd /franka_ws \
     && rosdep install -r -q  --from-paths src --skip-keys libfranka --ignore-src  --rosdistro ${ROSDISTRO} -y \
     && source /opt/ros/${ROSDISTRO}/setup.bash \
-    && catkin config -j 8 \
+    && catkin config -j $(nproc) \
     && catkin build \
     && rm -rf /var/lib/apt/lists/*
 

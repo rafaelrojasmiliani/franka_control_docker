@@ -1,36 +1,45 @@
 name: deploy
 on: push
 jobs:
-  deploy:
+  ros1:
     name: build image
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        configuration:
-          - lib_franka_tag: [0.2.0, 0.3.0]
-            franka_ros_tag: [0.1.0]
-            ros_distro: [melodic, noetic, foxy, humble]
+        ros_distro: [melodic, noetic]
+        franka_tags:
+          - lib_franka_tag: 0.3.0
+            franka_ros_tag: 0.4.0
+
+          - lib_franka_tag: 0.5.0
+            franka_ros_tag: 0.6.0
+
+          - lib_franka_tag: 0.7.1
+            franka_ros_tag: 0.7.0
     steps:
-      - name: Create ${{ matrix.configuration.lib_franka_tag }}, ${{ matrix.configuration.franka_ros_tag }}, ${{ matrix.configuration.ros_distro }}
-        run: echo "${{ matrix.configuration.lib_franka_tag }}, ${{ matrix.configuration.franka_ros_tag }}, ${{ matrix.configuration.ros_distro }} "
-#      - name: checkout code
-#        uses: actions/checkout@master
-#      - name: Login to DockerHub
-#        uses: docker/login-action@v1
-#        with:
-#          username: ${{ secrets.DOCKER_USERNAME }}
-#          password: ${{ secrets.DOCKER_PASSWORD }}
-#
-#      - name: Set up QEMU
-#        uses: docker/setup-qemu-action@v1
-#
-#      - name: Set up Docker Buildx
-#        uses: docker/setup-buildx-action@v1
-#
-#      - name: build and push to docker
-#        uses: docker/build-push-action@v2
-#        with:
-#          tags: rafa606/franka-control
-#          push: true
-#		  platforms: linux/amd64,linux/arm64
+      - name: checkout code
+        uses: actions/checkout@master
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: build and push to docker
+        uses: docker/build-push-action@v2
+        with:
+          tags: rafa606/franka-control
+          push: true
+		  platforms: linux/amd64,linux/arm64
+          tags: rafa606/franka-ros-control:libfranka${{ matrix.franka_tags.lib_franka_tag }}frankaros${{ matrix.franka_tags.franka_ros_tag }}
+          build-args: |
+            ROSDISTRO=${{ matrix.ros_distro }}
+            LIBFRANKA_VERSION=${{ matrix.franka_tags.lib_franka_tag }}
+            FRANKAROS_VERSION=${{ matrix.franka_tags.franka_ros_tag }}
