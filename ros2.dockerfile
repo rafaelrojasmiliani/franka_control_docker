@@ -12,6 +12,9 @@ RUN set -x && apt-get update \
             build-essential cmake git libpoco-dev libeigen3-dev \
 			screen vim iproute2 iputils-* \
 			ros-${ROSDISTRO}-joint-trajectory-controller ros-${ROSDISTRO}-control-toolbox \
+            ros-${ROSDISTRO}-xacro ros-${ROSDISTRO}-controller-manager ros-${ROSDISTRO}-joint-state-broadcaster \
+            ros-${ROSDISTRO}-joint-state-publisher \
+            ros-${ROSDISTRO}-ros2-control-test-assets ros-${ROSDISTRO}-xacro ros-${ROSDISTRO}-ament-clang-format \
     && git clone --recursive --branch ${LIBFRANKA_VERSION} https://github.com/frankaemika/libfranka /libfranka && cd /libfranka \
     && [ -f /libfranka/src/control_types.cpp ] && sed -i '1 i\#include <stdexcept>' /libfranka/src/control_types.cpp || true \
     && [ -f /libfranka/include/franka/control_tools.h ] && sed -i '1 i\#include <string>' /libfranka/include/franka/control_tools.h || true \
@@ -26,11 +29,11 @@ RUN set -x && apt-get update \
     && git clone --recursive --branch ${FRANKAROS_BRANCH} ${FRANKAROS_REPO} /franka_ws/src/franka_ros \
     && [ -d /franka_ws/src/franka_ros/franka_moveit_config ] && rm -rf /franka_ws/src/franka_ros/franka_moveit_config || true \
     && cd /franka_ws \
-    && rosdep install -r -q  --from-paths src --skip-keys libfranka --ignore-src  --rosdistro ${ROSDISTRO} -y \
+    && rosdep install -r -q  --from-paths src --skip-keys libfranka --skip-keys rviz2 --skip-keys joint_state_publisher_gui --skip-keys ament_cmake_clang_format --ignore-src  --rosdistro ${ROSDISTRO} -y \
     && source /opt/ros/${ROSDISTRO}/setup.bash \
     && colcon build \
     && rm -rf /var/lib/apt/lists/*
-#
+# ros-galactic-ros2-control-test-assets (galactic or foxy) ros-galactic-xacro ros-foxy-ament-clang-format
 #RUN echo $'\
 #termcapinfo xterm* ti@:te@ \n\
 #hardstatus alwayslastline \n\
