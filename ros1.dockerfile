@@ -6,7 +6,7 @@ ARG FRANKAROS_VERSION
 
 SHELL ["bash", "-c"]
 WORKDIR /
-RUN  apt-get update \
+RUN set -x && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
             build-essential cmake git libpoco-dev libeigen3-dev \
 			python3-catkin-tools screen vim iproute2 iputils-* \
@@ -19,16 +19,16 @@ RUN  apt-get update \
     && cmake  -DBUILD_TESTS=0 -DBUILD_EXAMPLES=0 -DCMAKE_BUILD_TYPE=Release .. \
     && make -j $(nproc)  \
     && cpack -G DEB \
-    && dpkg -i libfranka*deb
-#    && rosdep update \
-#    && mkdir -p franka_ws/src \
-#    && git clone --recursive --branch ${FRANKAROS_VERSION} https://github.com/frankaemika/franka_ros /franka_ws/src/franka_ros \
-#    && cd /franka_ws \
-#    && rosdep install -r -q  --from-paths src --skip-keys libfranka --ignore-src  --rosdistro ${ROSDISTRO} -y \
-#    && source /opt/ros/${ROSDISTRO}/setup.bash \
-#    && catkin config -j $(nproc) \
-#    && catkin build \
-#    && rm -rf /var/lib/apt/lists/*
+    && dpkg -i libfranka*deb \
+    && rosdep update \
+    && mkdir -p franka_ws/src \
+    && git clone --recursive --branch ${FRANKAROS_VERSION} https://github.com/frankaemika/franka_ros /franka_ws/src/franka_ros \
+    && cd /franka_ws \
+    && rosdep install -r -q  --from-paths src --skip-keys libfranka --ignore-src  --rosdistro ${ROSDISTRO} -y \
+    && source /opt/ros/${ROSDISTRO}/setup.bash \
+    && catkin config -j $(nproc) \
+    && catkin build \
+    && rm -rf /var/lib/apt/lists/*
 #
 #RUN echo $'\
 #termcapinfo xterm* ti@:te@ \n\
