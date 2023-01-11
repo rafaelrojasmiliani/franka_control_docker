@@ -15,6 +15,9 @@ jobs:
           - lib_franka_tag: 0.5.0
             franka_ros_tag: 0.6.0
 
+          - lib_franka_tag: 0.6.0
+            franka_ros_tag: 0.6.0
+
           - lib_franka_tag: 0.7.1
             franka_ros_tag: 0.7.0
     steps:
@@ -52,7 +55,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lib_franka_tag: [0.5.0, 0.7.1]
+        lib_franka_tag: [0.6.0 0.7.1]
         ros:
           - distro: foxy
             franka_ros_repo: https://github.com/frankaemika/franka_ros2.git

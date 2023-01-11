@@ -31,7 +31,7 @@ RUN set -x && apt-get update \
     && cd /franka_ws \
     && rosdep install -r -q  --from-paths src --skip-keys libfranka --skip-keys rviz2 --skip-keys joint_state_publisher_gui --skip-keys ament_cmake_clang_format --ignore-src  --rosdistro ${ROSDISTRO} -y \
     && source /opt/ros/${ROSDISTRO}/setup.bash \
-    && colcon build \
+    && colcon build --cmake-args -DBUILD_TESTING=OFF \
     && rm -rf /var/lib/apt/lists/*
 # ros-galactic-ros2-control-test-assets (galactic or foxy) ros-galactic-xacro ros-foxy-ament-clang-format
 #RUN echo $'\
