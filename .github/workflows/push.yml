@@ -1,6 +1,9 @@
 name: deploy
 on: push
 jobs:
+  # --------------------------------
+  # -------- ROS1 docker construction
+  # --------------------------------
   ros1:
     name: build image
     runs-on: ubuntu-latest
@@ -32,7 +35,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: build and push to docker
+      - name: build libfranka:${{ matrix.franka_tags.lib_franka_tag }}, distro:${{ matrix.ros_distro }}
         uses: docker/build-push-action@v2
         with:
           push: true
@@ -43,14 +46,16 @@ jobs:
             ROSDISTRO=${{ matrix.ros_distro }}
             LIBFRANKA_VERSION=${{ matrix.franka_tags.lib_franka_tag }}
             FRANKAROS_VERSION=${{ matrix.franka_tags.franka_ros_tag }}
+  # --------------------------------
   # -------- ROS2 docker construction
+  # --------------------------------
   ros2:
     name: build image
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        lib_franka_tag: [0.3.0, 0.5.0, 0.7.1]
+        lib_franka_tag: [0.5.0, 0.7.1]
         ros:
           - distro: foxy
             franka_ros_repo: https://github.com/frankaemika/franka_ros2.git
@@ -77,7 +82,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: build and push to docker
+      - name: build libfranka:${{ matrix.lib_franka_tag }}, distro:${{ matrix.ros.distro }}
         uses: docker/build-push-action@v2
         with:
           push: true
