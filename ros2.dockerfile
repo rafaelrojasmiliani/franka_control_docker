@@ -16,7 +16,7 @@ RUN  apt-get update \
     && [ -f /libfranka/src/control_types.cpp ] && sed -i '1 i\#include <stdexcept>' /libfranka/src/control_types.cpp || true \
     && mkdir build \
     && cd build \
-    && cmake -DCMAKE_BUILD_TYPE=Release .. \
+    && cmake  -DBUILD_TESTS=0 -DBUILD_EXAMPLES=0 -DCMAKE_BUILD_TYPE=Release .. \
     && make -j $(nproc)  \
     && cpack -G DEB \
     && dpkg -i libfranka*deb
