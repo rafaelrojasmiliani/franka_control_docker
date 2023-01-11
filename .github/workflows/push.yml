@@ -37,7 +37,7 @@ jobs:
         with:
           tags: rafa606/franka-control
           push: true
-		  platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64
           tags: rafa606/franka-ros-control:libfranka${{ matrix.franka_tags.lib_franka_tag }}frankaros${{ matrix.franka_tags.franka_ros_tag }}
           build-args: |
             ROSDISTRO=${{ matrix.ros_distro }}
