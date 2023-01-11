@@ -24,7 +24,7 @@ RUN set -x && apt-get update \
     && mkdir -p franka_ws/src \
     && git clone --recursive --branch ${FRANKAROS_VERSION} https://github.com/frankaemika/franka_ros /franka_ws/src/franka_ros \
     && cd /franka_ws \
-    && rosdep install -r -q  --from-paths src --skip-keys libfranka --ignore-src  --rosdistro ${ROSDISTRO} -y \
+    && rosdep install -r -q  --from-paths src --skip-keys libfranka --skip-keys rviz --skip-keys joint_state_publisher_gui --ignore-src  --rosdistro ${ROSDISTRO} -y \
     && source /opt/ros/${ROSDISTRO}/setup.bash \
     && catkin config -j $(nproc) \
     && catkin build \
