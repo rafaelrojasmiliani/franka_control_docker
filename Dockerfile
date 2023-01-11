@@ -1,4 +1,7 @@
-FROM moveit/moveit:melodic-release
+ARG ROSDISTRO
+FROM moveit/moveit:${ROSDISTRO}-release
+ARG ROSDISTRO
+ARG LIBFRANKA_VERSION
 
 SHELL ["bash", "-c"]
 WORKDIR /
@@ -6,7 +9,7 @@ RUN  apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
             build-essential cmake git libpoco-dev libeigen3-dev \
 			python3-catkin-tools screen vim iproute2 iputils-* \
-			ros-melodic-joint-trajectory-controller \
+			ros-${ROSDISTRO}-joint-trajectory-controller \
     && git clone --recursive --branch 0.7.1 https://github.com/frankaemika/libfranka /libfranka && cd /libfranka \
     && mkdir build \
     && cd build \
@@ -18,8 +21,8 @@ RUN  apt-get update \
     && mkdir -p franka_ws/src \
     && git clone --recursive --branch 0.7.0 https://github.com/frankaemika/franka_ros /franka_ws/src/franka_ros \
     && cd /franka_ws \
-    && rosdep install -r -q  --from-paths src --skip-keys libfranka --ignore-src  --rosdistro melodic -y \
-    && source /opt/ros/melodic/setup.bash \
+    && rosdep install -r -q  --from-paths src --skip-keys libfranka --ignore-src  --rosdistro ${ROSDISTRO} -y \
+    && source /opt/ros/${ROSDISTRO}/setup.bash \
     && catkin config -j 8 \
     && catkin build \
     && rm -rf /var/lib/apt/lists/*
