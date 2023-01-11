@@ -36,9 +36,56 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
+          file: ros1.dockerfile
           platforms: linux/amd64,linux/arm64
-          tags: rafa606/franka-ros-control:libfranka${{ matrix.franka_tags.lib_franka_tag }}frankaros${{ matrix.franka_tags.franka_ros_tag }}
+          tags: rafa606/franka-ros-control:${{ matrix.ros_distro }}-libfranka${{ matrix.franka_tags.lib_franka_tag }}-frankaros${{ matrix.franka_tags.franka_ros_tag }}
           build-args: |
             ROSDISTRO=${{ matrix.ros_distro }}
             LIBFRANKA_VERSION=${{ matrix.franka_tags.lib_franka_tag }}
             FRANKAROS_VERSION=${{ matrix.franka_tags.franka_ros_tag }}
+  # -------- ROS2 docker construction
+  ros2:
+    name: build image
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        lib_franka_tag: [0.3.0, 0.5.0, 0.7.1]
+        ros:
+          - distro: foxy
+            franka_ros_repo: https://github.com/frankaemika/franka_ros2.git
+            franka_ros_branch: develop
+          - distro: galactic
+            franka_ros_repo: https://github.com/mcbed/franka_ros2.git
+            franka_ros_branch: develop
+          - distro: humble
+            franka_ros_repo: https://github.com/Zarnack/franka_ros2.git
+            franka_ros_branch: humble
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@master
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: build and push to docker
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          file: ros2.dockerfile
+          platforms: linux/amd64,linux/arm64
+          tags: rafa606/franka-ros-control:${{ matrix.ros.distro }}-libfranka${{ matrix.lib_franka_tag }}-frankaros${{ matrix.franka_tags.franka_ros_tag }}
+          build-args: |
+            ROSDISTRO=${{ matrix.ros.distro }}
+            LIBFRANKA_VERSION=${{ matrix.lib_franka_tag }}
+            FRANKAROS_REPO=${{ matrix.ros.franka_ros_repo }}
+            FRANKAROS_BRANCH=${{ matrix.ros.franka_ros_branch }}
