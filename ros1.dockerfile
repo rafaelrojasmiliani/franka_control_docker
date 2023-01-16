@@ -29,7 +29,11 @@ RUN set -x && apt-get update \
     && [ -d /franka_ws/src/franka_ros/franka_example_controllers ] && rm -rf /franka_ws/src/franka_ros/franka_example_controllers || true \
     && [ -f /franka_ws/src/franka_ros/franka_ros/package.xml ] &&  sed -i '/moveit/d' /franka_ws/src/franka_ros/franka_ros/package.xml || true \
     && cd /franka_ws \
-    && rosdep install -r -q  --from-paths src --skip-keys libfranka --skip-keys rviz --skip-keys joint_state_publisher_gui --ignore-src  --rosdistro ${ROSDISTRO} -y \
+    && rosdep install -r -q  --from-paths src \
+                        --skip-keys libfranka --skip-keys rviz \
+                        --skip-keys joint_state_publisher_gui --skip-keys franka_visualization \
+                        --skip-keys franka_example_controllers  --skip-keys panda_moveit_config  \
+                        --ignore-src  --rosdistro ${ROSDISTRO} -y \
     && source /opt/ros/${ROSDISTRO}/setup.bash \
     && catkin config -j $(nproc) \
     && catkin build \
