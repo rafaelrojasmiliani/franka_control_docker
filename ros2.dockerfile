@@ -28,6 +28,10 @@ RUN set -x && apt-get update \
     && mkdir -p franka_ws/src \
     && git clone --recursive --branch ${FRANKAROS_BRANCH} ${FRANKAROS_REPO} /franka_ws/src/franka_ros \
     && [ -d /franka_ws/src/franka_ros/franka_moveit_config ] && rm -rf /franka_ws/src/franka_ros/franka_moveit_config || true \
+    && [ -d /franka_ws/src/franka_ros/franka_gazebo ] && rm -rf /franka_ws/src/franka_ros/franka_gazebo || true \
+    && [ -d /franka_ws/src/franka_ros/franka_visualization ] && rm -rf /franka_ws/src/franka_ros/franka_visualization || true \
+    && [ -d /franka_ws/src/franka_ros/franka_example_controllers ] && rm -rf /franka_ws/src/franka_ros/franka_example_controllers || true \
+    && [ -f /franka_ws/src/franka_ros/franka_ros/package.xml ] &&  sed -i '/moveit/d' /franka_ws/src/franka_ros/franka_ros/package.xml || true \
     && cd /franka_ws \
     && rosdep install -r -q  --from-paths src --skip-keys libfranka --skip-keys rviz2 --skip-keys joint_state_publisher_gui --skip-keys ament_cmake_clang_format --ignore-src  --rosdistro ${ROSDISTRO} -y \
     && source /opt/ros/${ROSDISTRO}/setup.bash \
