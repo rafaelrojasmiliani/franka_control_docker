@@ -20,6 +20,9 @@ jobs:
 
           - lib_franka_tag: 0.7.1
             franka_ros_tag: 0.7.0
+
+          - lib_franka_tag: 0.8.0
+            franka_ros_tag: 0.8.0
     steps:
       - name: checkout code
         uses: actions/checkout@master
@@ -41,7 +44,7 @@ jobs:
           push: true
           file: ros1.dockerfile
           platforms: linux/amd64,linux/arm64
-          tags: rafa606/franka-ros-control:${{ matrix.ros_distro }}-libfranka${{ matrix.franka_tags.lib_franka_tag }}-frankaros${{ matrix.franka_tags.franka_ros_tag }}
+          tags: rafa606/franka-ros-control:${{ matrix.ros_distro }}-libfranka${{ matrix.franka_tags.lib_franka_tag }}
           build-args: |
             ROSDISTRO=${{ matrix.ros_distro }}
             LIBFRANKA_VERSION=${{ matrix.franka_tags.lib_franka_tag }}
@@ -55,7 +58,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lib_franka_tag: [0.6.0, 0.7.1]
+        lib_franka_tag: [0.6.0, 0.7.1, 0.8.0]
         ros:
           - distro: foxy
             franka_ros_repo: https://github.com/frankaemika/franka_ros2.git
@@ -88,7 +91,7 @@ jobs:
           push: true
           file: ros2.dockerfile
           platforms: linux/amd64,linux/arm64
-          tags: rafa606/franka-ros-control:${{ matrix.ros.distro }}-libfranka${{ matrix.lib_franka_tag }}-frankaros${{ matrix.franka_tags.franka_ros_tag }}
+          tags: rafa606/franka-ros-control:${{ matrix.ros.distro }}-libfranka${{ matrix.lib_franka_tag }}
           build-args: |
             ROSDISTRO=${{ matrix.ros.distro }}
             LIBFRANKA_VERSION=${{ matrix.lib_franka_tag }}
