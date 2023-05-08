@@ -35,8 +35,9 @@ RUN set -x && apt-get update \
                         --skip-keys franka_example_controllers  --skip-keys panda_moveit_config  \
                         --ignore-src  --rosdistro ${ROSDISTRO} -y \
     && source /opt/ros/${ROSDISTRO}/setup.bash \
-    && catkin config -j $(nproc) -DCMAKE_BUILD_TYPE=Release \
+    && catkin config -j $(nproc) -DCMAKE_BUILD_TYPE=Release --install --install-space /opt/ros/${ROSDISTRO}/ --extend  /opt/ros/${ROSDISTRO}/ \
     && catkin build \
+    && cd / && rm -rf /franka_ws \
     && rm -rf /var/lib/apt/lists/*
 #
 #RUN echo $'\
