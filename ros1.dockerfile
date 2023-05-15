@@ -39,34 +39,69 @@ RUN set -x && apt-get update \
     && catkin build \
     && cd / && rm -rf /franka_ws \
     && rm -rf /var/lib/apt/lists/*
-#
-#RUN echo $'\
-#termcapinfo xterm* ti@:te@ \n\
-#hardstatus alwayslastline \n\
-#hardstatus string \'%{= kG}[%{G}%H%? %1`%?%{g}][%= %{= kw}%-w%{+b yk} %n*%t%?(%u)%? %{-}%+w %=%{g}][%{B}%m/%d %{W}%C%A%{g}]\' \n\
-#attrcolor b ".I" \n\
-#defbce on \n\
-#startup_message off \n\
-#mousetrack on \n\
-#screen -t franka_control 1 bash \n\
-#screen -t control_manager_and_bash  2 bash \n\
-#select 1 \n\
-#stuff "sleep 2; roslaunch franka_control franka_control.launch robot_ip:=ROBOT_IP" \n\
-#split -v \n\
-#focus next \n\
-#select 2 \n\
-#stuff "sleep 3; rosrun controller_manager spawner position_joint_trajectory_controller" \n\
-#layout save default' > /screen_conf_base \
-#&& echo $'\
-##!/bin/bash\n\
-#main(){\n\
-#source /franka_ws/devel/setup.bash \n\
-#export ROS_MASTER_URI=$1\n\
-#export ROS_IP=$2\n\
-#export ROS_NAMESPACE=$3 \n\
-#screen -S roscore -d -m roscore \n\
-#cat screen_conf_base | sed "s/ROBOT_IP/$4/" > /screen_conf \n\
-#screen -c /screen_conf \n\
-#}\n\
-#main $@' > /entrypoint.bash
-#ENTRYPOINT ["bash", "/entrypoint.bash"]
+
+RUN  echo $'\
+#!/bin/bash\n\
+usage() {\n\
+    echo -e "\n\nusage:\n    docker run \\\n\
+--network=host --privileged IMAGE \\\n\
+--ros_ip=ROS_IP \\\n\
+--ros_master_uri=ROS_MASTER_URI \\\n\
+--robot_ip=ROBOT_IP \\\n\
+[--ros_ns=NAME_SPACE]\n\
+\\n\\n note: there is no space around the \"=\" signs."\n\
+}\n\
+main() {\n\
+\n\
+    if [[ $# -lt 3 ]]; then\n\
+        usage\n\
+        exit 1\n\
+    fi\n\
+    ARGUMENT_LIST=(\n\
+        "robot_ip"\n\
+        "ros_master_uri"\n\
+        "ros_ip"\n\
+        "ros_ns"\n\
+    )\n\
+    opts=$(\n\
+        getopt \\\n\
+            --longoptions "$(printf "%s:," "${ARGUMENT_LIST[@]}")" \\\n\
+            --name "$(basename "$0")" \\\n\
+            --options "" \\\n\
+            -- "$@" || usage && exit 1\n\
+    )\n\
+    eval set --$opts\n\
+    local ros_ns=""\n\
+    while [[ $# -gt 1 ]]; do\n\
+        case "$1" in\n\
+        --robot_ip)\n\
+            robot_ip="$2"\n\
+            shift 2\n\
+            ;;\n\
+        --ros_master_uri)\n\
+            ros_master_uri="$2"\n\
+            shift 2\n\
+            ;;\n\
+        --ros_ip)\n\
+            ros_ip="$2"\n\
+            shift 2\n\
+            ;;\n\
+        --ros_ns)\n\
+            ros_ns="$2"\n\
+            shift 2\n\
+            ;;\n\
+        *)\n\
+            usage\n\
+            exit 1\n\
+            ;;\n\
+        esac\n\
+    done\n\
+    export ROS_MASTER_URI=$ros_master_uri\n\
+    export ROS_IP=$ros_ip\n\
+    if [[ ! -z $ros_ns ]]; then\n\
+        export ROS_NAMESPACE=$ros_ns\n\
+    fi\n\
+    roslaunch franka_control franka_control.launch robot_ip:=$robot_ip\n\
+}\n\
+main $@' > /entrypoint.bash
+ENTRYPOINT ["bash", "/entrypoint.bash"]
