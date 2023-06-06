@@ -33,6 +33,7 @@ RUN set -x && apt-get update \
                         --skip-keys libfranka --skip-keys rviz \
                         --skip-keys joint_state_publisher_gui --skip-keys franka_visualization \
                         --skip-keys franka_example_controllers  --skip-keys panda_moveit_config  \
+                        --skip-keys franka_gazebo \
                         --ignore-src  --rosdistro ${ROSDISTRO} -y \
     && source /opt/ros/${ROSDISTRO}/setup.bash \
     && catkin config -j $(nproc) -DCMAKE_BUILD_TYPE=Release --install --install-space /opt/ros/${ROSDISTRO}/ --extend  /opt/ros/${ROSDISTRO}/ \
